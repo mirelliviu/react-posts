@@ -28,7 +28,7 @@ const Nav = ({ search, setSearch }) => {
                         <Link to="/contact">Contact</Link>
                     </li>
                     <li>
-                        <Link to="/invoices">Invoices</Link>
+                        <Link to="/alert">Alert</Link>
                     </li>
                 </ul>
             </nav>  

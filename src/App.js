@@ -8,8 +8,10 @@ import PostPage from './PostPage';
 import EditPost from './EditPost';
 import About from './About';
 import Contact from './Contact';
-import InvoiceList from './InvoiceList';
+import UpdatePassword from './UpdatePassword';
+import AlertDismissible from './AlertDismissible';
 import Missing from './Missing';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { 
   BrowserRouter, 
   Routes, 
@@ -19,7 +21,6 @@ import {
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { postsAPI, emailAPI, invoicesAPI } from './api/posts';
-import easyinvoice from 'easyinvoice';
 const qs = require('qs');
 
 
@@ -36,7 +37,6 @@ function App() {
   const [email, setEmail] = useState('');
   const [company, setCompany] = useState('');
   const [message, setMessage] = useState('');
-  const [invoices, setInvoices] = useState([]);
   const navigate = useNavigate();
 
   // GET Posts from JSON server
@@ -61,25 +61,25 @@ function App() {
   }, [])
 
   // GET Invoices from JSON server
-  useEffect(() => {
-    const fetchInvoices = async () => {
-      try {
-          // AXIOS check automatically if RESPONSE is in 200 range
-          const response = await invoicesAPI.get('/invoices');
-          setInvoices(response.data);
-      } catch (err) {
-        if (err.response) {
-            // Not in the 200 response range
-            console.log(err.response.data);
-            console.log(err.response.status);
-            console.log(err.response.headers);
-        } else {
-            console.log(`Error: ${err.message}`);
-        }
-      }
-    }
-    fetchInvoices();
-  }, [])
+  // useEffect(() => {
+  //   const fetchInvoices = async () => {
+  //     try {
+  //         // AXIOS check automatically if RESPONSE is in 200 range
+  //         const response = await invoicesAPI.get('/invoices');
+  //         setInvoices(response.data);
+  //     } catch (err) {
+  //       if (err.response) {
+  //           // Not in the 200 response range
+  //           console.log(err.response.data);
+  //           console.log(err.response.status);
+  //           console.log(err.response.headers);
+  //       } else {
+  //           console.log(`Error: ${err.message}`);
+  //       }
+  //     }
+  //   }
+  //   fetchInvoices();
+  // }, [])
 
   // Search and filter function
   useEffect(() => {
@@ -159,75 +159,7 @@ function App() {
     }
   }
 
-  // Create Invoice
-  const createInvoice = async (e) => {
-    e.preventDefault();
-    let data = {
-      "sender": {
-          "company": "Mares Liviu PFA",
-          "address": "Alexandru Cutieru 25A",
-          "zip": "1234 AB",
-          "city": "Bucuresti",
-          "country": "Romania"
-          //"custom1": "custom value 1",
-          //"custom2": "custom value 2",
-          //"custom3": "custom value 3"
-      },
-      // Your recipient
-      "client": {
-          "company": "Persoana Fizica",
-          "address": "Plaza Romania",
-          "zip": "4567 CD",
-          "city": "Bucuresti",
-          "country": "Romania"
-          // "custom1": "custom value 1",
-          // "custom2": "custom value 2",
-          // "custom3": "custom value 3"
-      },
-      "information": {
-          // Invoice number
-          "number": "2022.0001",
-          // Invoice data
-          "date": "26-12-2022",
-          // Invoice due date
-          "due-date": "31-01-2023"
-      },
-      "products": [
-          {
-              "quantity": 3,
-              "description": "Caffe Latte",
-              "tax-rate": 19,
-              "price": 19
-          },
-          {
-              "quantity": 4,
-              "description": "Muffin",
-              "tax-rate": 19,
-              "price": 14.9
-          },
-          {
-              "quantity": 2,
-              "description": "Ice Latte",
-              "tax-rate": 19,
-              "price": 17.9
-          }
-      ]
-  };
-      const result = await easyinvoice.createInvoice(data);
-      const id = invoices.length ? invoices[invoices.length - 1].id + 1 : 1;
-      const datetime = format(new Date(), 'MMMM dd, yyyy pp');
-      const newInvoice = { id, pdf: `${result.pdf}`, datetime, name: `Factura ${id}` };
-
-    try {
-      const response = await invoicesAPI.post('/invoices', newInvoice);
-
-      const allInvoices = [...invoices, response.data.pdf];
-      setInvoices(allInvoices);
-      
-    } catch (err) {
-        console.log(`Error: ${err.message}`);
-    }
-  }
+  
   
   // Render App Elements
   return (
@@ -270,6 +202,9 @@ function App() {
                         setEditBody={setEditBody}
               />} 
           />
+          <Route path='/update-password/:token' 
+                  element={ <UpdatePassword />} 
+          />
           <Route path='/post/:id' 
                 element={
                   <PostPage 
@@ -294,9 +229,9 @@ function App() {
                     setMessage={setMessage}
                   />} 
           />
-          <Route path='/invoices' 
+          <Route path='/alert' 
                   element={
-                    <InvoiceList />} 
+                    <AlertDismissible />} 
           />
           <Route path='*' element={<Missing />} />
           </Route>
